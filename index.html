@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encryption and Decryption</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        textarea {
+            width: calc(100% - 20px);
+            height: 150px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            resize: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 20px;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Encryption and Decryption</h1>
+        <label for="keyInput">Enter key (random arrangement of alphabets):</label>
+        <input type="text" id="keyInput" placeholder="Enter key">
+        <button onclick="generateKey()">Generate Key</button>
+        <textarea id="inputText" placeholder="Enter text to encrypt or decrypt"></textarea>
+        <button onclick="encrypt()">Encrypt</button>
+        <button onclick="decrypt()">Decrypt</button>
+        <textarea id="outputText" placeholder="Result will appear here" readonly></textarea>
+    </div>
+    <script>
+        function generateKey() {
+            var alphabet = "abcdefghijklmnopqrstuvwxyz";
+            var shuffledAlphabet = shuffle(alphabet.split("")).join("");
+            document.getElementById("keyInput").value = shuffledAlphabet;
+        }
+
+        function shuffle(array) {
+            var currentIndex = array.length, temporaryValue, randomIndex;
+
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+
+            return array;
+        }
+
+        function encrypt() {
+            var plaintext = document.getElementById("inputText").value;
+            var key = document.getElementById("keyInput").value.toLowerCase();
+            var encryptedText = b(plaintext, key);
+            document.getElementById("outputText").value = encryptedText;
+        }
+
+        function decrypt() {
+            var encryptedText = document.getElementById("inputText").value;
+            var key = document.getElementById("keyInput").value.toLowerCase();
+            var originalText = a(encryptedText, key);
+            document.getElementById("outputText").value = originalText;
+        }
+
+        function b(text, key) {
+            var encryptedText = "";
+            var keyList = key.split("");
+
+            for (var i = 0; i < text.length; i++) {
+                var char = text[i].toLowerCase(); // 大文字と小文字を区別しないように変換
+                if (char === " ") {
+                    encryptedText += " ";
+                    continue;
+                }
+                var charIndex = keyList.indexOf(char); // 文字のインデックスを取得
+                if (charIndex !== -1) { // 文字がリストに存在する場合のみ処理
+                    encryptedText += charIndex + "."; // インデックスを追加
+                } else {
+                    encryptedText += char; // 文字がアルファベットでない場合はそのまま追加
+                }
+            }
+
+            return encryptedText;
+        }
+
+        function a(encryptedText, key) {
+            var originalText = "";
+            var keyList = key.split("");
+
+            var parts = encryptedText.split("."); // インデックスの間に "." があるため、これで分割
+
+            for (var i = 0; i < parts.length; i++) {
+                var encryptedPart = parts[i];
+                if (encryptedPart === "") { // 空の部分はスキップする
+                    continue;
+                }
+                var index = parseInt(encryptedPart, 10); // 文字のインデックスを数値に変換
+                originalText += keyList[index]; // インデックスに対応するアルファベットを取得し、元の文字列に追加
+            }
+
+            return originalText; // 元の文字列を返す
+        }
+    </script>
+</body>
+</html>
